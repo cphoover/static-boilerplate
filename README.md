@@ -11,7 +11,7 @@ Main Tasks
 
 Sub Tasks
 ------------------------------
-    bundle-shared
+    bundle:shared
     lint:js
     lint:jsx
     lint:package
