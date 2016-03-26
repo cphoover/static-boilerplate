@@ -38,7 +38,8 @@ const sharedLibs = [
 	'react',
 	'redux',
 	'react-redux',
-	'react-dom'
+	'react-dom',
+	'./components/navigation/navigation.jsx'
 ];
 
 gulp.task('clean', function () {
@@ -60,7 +61,10 @@ function handleError(err, msg) {
 }
 
 gulp.task('bundle:shared', ['clean'], function bundleVendorRun() {
-	const bundler = browserify();
+	const bundler = browserify().transform(babelify.configure({
+		presets: ['es2015', 'react']
+	}));
+
 	sharedLibs.forEach(lib => bundler.require(lib));
 	return bundler.bundle()
 		.on('error', err => handleError('issue while bundling shared libs!!!', err))
@@ -84,7 +88,7 @@ pages.forEach(function (page) {
 	const prefix = 'page:' + page,
 			folder = path.join(pagesDir, page),
 			reactFile = path.join(folder, `${strongCase(page)}.jsx`),
-			pageBuildDir = path.join(buildDir, page);
+			pageBuildDir = page === 'index' ? buildDir : path.join(buildDir, page);
 
 	gulp.task(`${prefix}:build-page`, [`${prefix}:bundle`], function buildPage() {
 		// this is an unfortunately weird way of handling the differences between common.js and imports;
@@ -117,7 +121,6 @@ pages.forEach(function (page) {
 			.on('error', err => handleError('uh oh issue while bundling shared libs!!!', err))
 			.pipe(source('main.js'))
 			.pipe(gulp.dest(pageBuildDir));
-
 	});
 
 });
