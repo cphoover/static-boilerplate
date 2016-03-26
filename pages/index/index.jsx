@@ -1,4 +1,5 @@
 import React from 'react';
+import Navigation from '../../components/navigation/navigation.jsx'
 
 export default class Index extends React.Component {
 	constructor(props) {
@@ -14,6 +15,7 @@ export default class Index extends React.Component {
 	}
 	render() {
 		return <div>
+				<Navigation/>
 				<h1>{this.state.message}</h1>
 			<input type="text" value={ this.state.message } onChange={ this.handleChange.bind(this) } />
 		</div>;

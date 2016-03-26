@@ -4,6 +4,8 @@ import fs from 'fs';
 import uglify from 'gulp-uglify';
 import rename from 'gulp-rename';
 import sourcemaps from 'gulp-sourcemaps';
+import runSequence from 'run-sequence';
+import less from 'gulp-less';
 
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
@@ -39,7 +41,7 @@ const sharedLibs = [
 	'redux',
 	'react-redux',
 	'react-dom',
-	'./components/navigation/navigation.jsx'
+	'./components/navigation/navigation.jsx' // shouldn't have to do this... all components should be bundled as shared
 ];
 
 gulp.task('clean', function () {
@@ -90,6 +92,14 @@ pages.forEach(function (page) {
 			reactFile = path.join(folder, `${strongCase(page)}.jsx`),
 			pageBuildDir = page === 'index' ? buildDir : path.join(buildDir, page);
 
+
+	gulp.task(`${prefix}:css`, function css() {
+		return gulp.src(path.join(folder, `${page}.less`))
+			.pipe(less())
+			.pipe(rename('page.css'))
+			.pipe(gulp.dest(pageBuildDir));
+	});
+
 	gulp.task(`${prefix}:build-page`, [`${prefix}:bundle`], function buildPage() {
 		// this is an unfortunately weird way of handling the differences between common.js and imports;
 		const Page = require(reactFile).default;
@@ -125,7 +135,11 @@ pages.forEach(function (page) {
 
 });
 
-gulp.task('build', ['bundle'], function minifyJavascript() {
+gulp.task('build', function (cb) {
+	runSequence('clean', 'minify', cb);
+});
+
+gulp.task('minify', ['bundle'], function minifyJavascript() {
 	return gulp.src(['./build/**/*.js'])
 			.pipe(rename({
 				extname: '.min.js'
@@ -138,7 +152,9 @@ gulp.task('build', ['bundle'], function minifyJavascript() {
 			.pipe(gulp.dest(path.join(buildDir)));
 });
 
-gulp.task('bundle', pages.map(p => `page:${p}:build-page`));
+gulp.task('bundle', pages.map(p => `page:${p}:build-page`).concat(
+	pages.map(p =>`page:${p}:css`)
+));
 
 
 const config = {

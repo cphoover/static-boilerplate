@@ -13,7 +13,7 @@ export default class About extends React.Component {
 		});
 	}
 	render() {
-		return <div>
+		return <div id='page-about'>
 				<h1>{this.state.message}</h1>
 			<input type="text" value={ this.state.message } onChange={ this.handleChange.bind(this) } />
 		</div>;
