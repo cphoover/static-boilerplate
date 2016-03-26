@@ -59,7 +59,7 @@ function handleError(err, msg) {
 	throw err;
 }
 
-gulp.task('bundle-shared', ['clean'], function bundleVendorRun() {
+gulp.task('bundle:shared', ['clean'], function bundleVendorRun() {
 	const bundler = browserify();
 	sharedLibs.forEach(lib => bundler.require(lib));
 	return bundler.bundle()
@@ -98,7 +98,7 @@ pages.forEach(function (page) {
 	});
 
 	// change this so it's page specific
-	gulp.task(`${prefix}:bundle`, ['bundle-shared'], function bundleRun() {
+	gulp.task(`${prefix}:bundle`, ['bundle:shared'], function bundleRun() {
 		const bundler = browserify([reactFile]).transform(babelify.configure({
 			presets: ['es2015', 'react']
 		}));
